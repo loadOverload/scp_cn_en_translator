@@ -1,0 +1,39 @@
+# =============================================================
+# 阶段 1 / 2：短训练集（段落级转换）
+#
+#   数据：data/conversion/short.*.chat.jsonl   265,923 条，p50 185 tokens
+#   目标：先把"英文段 ↔ 中文段"的映射学稳
+#
+#   运行： ./py scripts/train.py --config configs/train.convert.stage1.yaml
+# =============================================================
+
+defaults: train.yaml
+
+model:
+  name_or_path: Qwen/Qwen2.5-7B-Instruct
+
+training:
+  output_dir: outputs/qwen2.5-7b-scp-convert-stage1
+  # 短样本很小（p50 185 tokens），batch 开大以摊薄每步固定开销；
+  # 有效 batch 仍是 16，与原来的梯度累积一致
+  per_device_train_batch_size: 8
+  per_device_eval_batch_size: 8
+  gradient_accumulation_steps: 2
+  num_train_epochs: 1                    # 265,923 条，一轮约 16,600 步
+  learning_rate: 1.0e-4
+  # p99 是 1,375、p99.9 是 3,882，4096 只丢掉约 0.1% 的样本。
+  # 不开 16384 是为了让 batch=8 也不会在遇到长样本时爆显存。
+  max_seq_length: 4096
+  overlong_policy: drop
+  train_on_assistant_only: true
+  logging_steps: 20
+  save_steps: 1000
+  save_total_limit: 2
+  eval_steps: 1000
+  eval_strategy: steps
+  dataloader_num_workers: 8
+  seed: 42
+
+data_files:
+  chat_train: data/conversion/short.train.chat.jsonl
+  chat_val: data/conversion/short.val.chat.jsonl

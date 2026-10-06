@@ -1,0 +1,55 @@
+[
+  {
+    "label": "baseline",
+    "overrides": {},
+    "ok": true,
+    "error": "",
+    "wall_seconds": 134.9,
+    "steps_done": 3,
+    "per_step": 38.0,
+    "first_step": 33,
+    "train_runtime": 121.58,
+    "num_tokens": 152266.0,
+    "mean_util": 90.4,
+    "mean_power": 298.8,
+    "peak_vram_gb": 23.54,
+    "log": "/tmp/bench/baseline.log"
+  },
+  {
+    "label": "liger off",
+    "overrides": {
+      "training.use_liger_kernel": false
+    },
+    "ok": true,
+    "error": "",
+    "wall_seconds": 159.7,
+    "steps_done": 3,
+    "per_step": 37.0,
+    "first_step": 28,
+    "train_runtime": 150.2569,
+    "num_tokens": 152266.0,
+    "mean_util": 93.5,
+    "mean_power": 262.3,
+    "peak_vram_gb": 23.54,
+    "log": "/tmp/bench/liger_off.log"
+  },
+  {
+    "label": "bs2 x accum8",
+    "overrides": {
+      "training.per_device_train_batch_size": 2,
+      "training.gradient_accumulation_steps": 8
+    },
+    "ok": false,
+    "error": "Backend impl 'liger_kernel.ops.backends._cutedsl.rope' for op 'rope' could not be imported: ImportError: cutedsl backend requires the NVIDIA",
+    "wall_seconds": 298.6,
+    "steps_done": 0,
+    "per_step": null,
+    "first_step": null,
+    "train_runtime": null,
+    "num_tokens": null,
+    "mean_util": 95.4,
+    "mean_power": 124.2,
+    "peak_vram_gb": 23.5,
+    "log": "/tmp/bench/bs2_x_accum8.log"
+  }
+]

@@ -1,0 +1,230 @@
+[
+  {
+    "run": "base",
+    "adapter": "(none)",
+    "n": 18,
+    "seconds": 925.8,
+    "seconds_per_sample": 51.4,
+    "bleu": 42.3641,
+    "chrf": 46.0005,
+    "rouge_l": 71.3273,
+    "wikidot": {
+      "score": 0.8239,
+      "perfect_ratio": 0.0556,
+      "errors_total": 115,
+      "errors_mean": 6.3889,
+      "samples_with_errors": 17,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.922,
+        "param": 0.802,
+        "tag": 0.6798,
+        "url": 0.9246
+      },
+      "top_issues": {
+        "tag_missing": 42,
+        "param_missing": 38,
+        "inline_missing": 18,
+        "url_missing": 9,
+        "inline_unbalanced": 8
+      },
+      "n": 18
+    },
+    "length": {
+      "n": 18,
+      "anomalies": 1,
+      "anomaly_ratio": 0.0556,
+      "reason_counts": {
+        "too_long": 1,
+        "not_chinese": 1
+      },
+      "hyp_ref_ratio_p05": 0.7259,
+      "hyp_ref_ratio_p50": 0.9578,
+      "hyp_ref_ratio_p95": 1.7892,
+      "examples": [
+        {
+          "index": 2,
+          "reasons": [
+            "too_long",
+            "not_chinese"
+          ],
+          "hyp_chars": 3775,
+          "ref_chars": 639,
+          "src_chars": 4222,
+          "hyp_plain_chars": 2574,
+          "ref_plain_chars": 99,
+          "hyp_ref_ratio": 26.0,
+          "hyp_ref_ratio_raw": 5.9077,
+          "hyp_cjk_ratio": 0.0653
+        }
+      ]
+    },
+    "per_stratum": {
+      "long": {
+        "n": 5,
+        "chrf": 48.1453
+      },
+      "medium": {
+        "n": 10,
+        "chrf": 43.3375
+      },
+      "short": {
+        "n": 3,
+        "chrf": 47.4928
+      }
+    }
+  },
+  {
+    "run": "stage1",
+    "adapter": "outputs/qwen2.5-7b-scp-convert-stage1/final_adapter",
+    "n": 18,
+    "seconds": 2014.2,
+    "seconds_per_sample": 111.9,
+    "bleu": 51.5799,
+    "chrf": 56.0931,
+    "rouge_l": 77.2497,
+    "wikidot": {
+      "score": 0.9058,
+      "perfect_ratio": 0.1667,
+      "errors_total": 85,
+      "errors_mean": 4.7222,
+      "samples_with_errors": 15,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.9371,
+        "param": 0.9003,
+        "tag": 0.8497,
+        "url": 0.8642
+      },
+      "top_issues": {
+        "tag_missing": 24,
+        "param_missing": 18,
+        "inline_missing": 17,
+        "url_missing": 15,
+        "inline_unbalanced": 11
+      },
+      "n": 18
+    },
+    "length": {
+      "n": 18,
+      "anomalies": 1,
+      "anomaly_ratio": 0.0556,
+      "reason_counts": {
+        "too_long": 1,
+        "not_chinese": 1
+      },
+      "hyp_ref_ratio_p05": 0.7575,
+      "hyp_ref_ratio_p50": 0.9365,
+      "hyp_ref_ratio_p95": 1.7932,
+      "examples": [
+        {
+          "index": 2,
+          "reasons": [
+            "too_long",
+            "not_chinese"
+          ],
+          "hyp_chars": 2217,
+          "ref_chars": 639,
+          "src_chars": 4222,
+          "hyp_plain_chars": 1331,
+          "ref_plain_chars": 99,
+          "hyp_ref_ratio": 13.4444,
+          "hyp_ref_ratio_raw": 3.4695,
+          "hyp_cjk_ratio": 0.0841
+        }
+      ]
+    },
+    "per_stratum": {
+      "long": {
+        "n": 5,
+        "chrf": 59.6669
+      },
+      "medium": {
+        "n": 10,
+        "chrf": 52.0775
+      },
+      "short": {
+        "n": 3,
+        "chrf": 53.385
+      }
+    }
+  },
+  {
+    "run": "stage3",
+    "adapter": "outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter",
+    "n": 18,
+    "seconds": 2327.0,
+    "seconds_per_sample": 129.3,
+    "bleu": 51.9328,
+    "chrf": 58.8964,
+    "rouge_l": 80.0731,
+    "wikidot": {
+      "score": 0.9372,
+      "perfect_ratio": 0.0556,
+      "errors_total": 62,
+      "errors_mean": 3.4444,
+      "samples_with_errors": 17,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.9796,
+        "param": 0.9665,
+        "tag": 0.8812,
+        "url": 0.8304
+      },
+      "top_issues": {
+        "url_missing": 20,
+        "tag_missing": 19,
+        "inline_unbalanced": 11,
+        "inline_missing": 9,
+        "param_missing": 3
+      },
+      "n": 18
+    },
+    "length": {
+      "n": 18,
+      "anomalies": 1,
+      "anomaly_ratio": 0.0556,
+      "reason_counts": {
+        "too_long": 1,
+        "not_chinese": 1
+      },
+      "hyp_ref_ratio_p05": 0.8419,
+      "hyp_ref_ratio_p50": 0.9794,
+      "hyp_ref_ratio_p95": 1.8502,
+      "examples": [
+        {
+          "index": 2,
+          "reasons": [
+            "too_long",
+            "not_chinese"
+          ],
+          "hyp_chars": 3937,
+          "ref_chars": 639,
+          "src_chars": 4222,
+          "hyp_plain_chars": 2672,
+          "ref_plain_chars": 99,
+          "hyp_ref_ratio": 26.9899,
+          "hyp_ref_ratio_raw": 6.1612,
+          "hyp_cjk_ratio": 0.0442
+        }
+      ]
+    },
+    "per_stratum": {
+      "long": {
+        "n": 5,
+        "chrf": 63.471
+      },
+      "medium": {
+        "n": 10,
+        "chrf": 53.5158
+      },
+      "short": {
+        "n": 3,
+        "chrf": 57.8159
+      }
+    }
+  }
+]

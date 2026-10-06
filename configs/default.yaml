@@ -1,0 +1,212 @@
+# =============================================================
+# SCP-translator :: default configuration (paths / data / serving)
+# All scripts read this file; override with --config or CLI flags.
+# =============================================================
+
+project_root: .
+
+seed: 42
+
+# ---------------------------------------------------------------
+# Directories (relative to project_root unless absolute)
+# ---------------------------------------------------------------
+paths:
+  raw_dir: data/raw
+  raw_en_dir: data/raw/en
+  raw_zh_dir: data/raw/zh
+  cleaned_dir: data/cleaned
+  splits_dir: data/splits
+  samples_dir: data/samples
+  processed_dir: data/processed
+  qa_dir: data/qa
+  output_dir: outputs
+  log_dir: logs
+  # HF cache on a NATIVE filesystem. Measured: reading the tokenizer from the
+  # DrvFs mount (/mnt/d, 9p) takes 23 s, from ext4 it takes ~1 s -- and every
+  # worker process pays it.
+  hf_home: ~/.cache/huggingface
+
+# ---------------------------------------------------------------
+# HuggingFace access
+#   huggingface.co is NOT reachable from this machine.
+#   hf-mirror.com IS reachable -> default endpoint points there.
+# ---------------------------------------------------------------
+hf:
+  endpoint: https://hf-mirror.com
+  local_files_only: false
+
+# ---------------------------------------------------------------
+# Phase 1 :: raw pair loading
+# ---------------------------------------------------------------
+data:
+  # auto | dir | jsonl | json | csv | sqlite
+  # "dir"  -> pair files in raw_en_dir / raw_zh_dir by normalized page id
+  # others -> single file/DB described by `pairs_file`
+  source: auto
+  pairs_file: null
+  # column names accepted when loading jsonl/json/csv/sqlite
+  # (first match wins, case-insensitive)
+  id_fields: [id, page_id, scp_id, name, title, key]
+  source_fields: [source, src, en, english, source_text, en_text, input]
+  target_fields: [target, tgt, zh, chinese, target_text, zh_text, output]
+  # filename suffixes stripped when deriving the page id from a filename
+  id_strip_suffixes: ["_zh", "-zh", "_cn", "-cn", "_zh-cn", "_chinese", "_中文", ".zh", ".cn", "_translated"]
+  # recursive scan of raw_en_dir / raw_zh_dir
+  recursive: true
+  # extensions considered when scanning the raw dirs
+  extensions: [".txt", ".wikidot", ".wiki", ".wtxt", ".md", ""]
+
+# ---------------------------------------------------------------
+# Phase 1 :: cleaning / quality filtering  (deliberately conservative)
+# ---------------------------------------------------------------
+clean:
+  normalize_line_endings: true
+  strip_bom: true
+  # trailing/leading whitespace of the whole document only,
+  # never per-line (indentation is meaningful in Wikidot)
+  strip_outer_whitespace: true
+
+  min_source_chars: 200
+  min_target_chars: 80
+  min_source_words: 40
+
+  # char-length ratio target/source: EN -> ZH usually lands in 0.35 .. 1.2
+  length_ratio_min: 0.15
+  length_ratio_max: 2.5
+  # true  -> drop samples outside the ratio band
+  # false -> keep them but flag "length_ratio_outlier"
+  drop_on_ratio_extreme: false
+
+  # CJK sanity on the Chinese side
+  min_target_cjk_ratio: 0.10
+  # latin sanity on the English side
+  min_source_latin_ratio: 0.20
+
+  # duplicate handling
+  drop_exact_duplicates: true       # same (source, target) bytes
+  drop_same_source_duplicates: true # same source, different target -> keep 1
+  drop_identical_sides: true        # source == target (untranslated copy-paste)
+
+  # never touch Wikidot markup: keep a hash of the raw text for auditing
+  record_hashes: true
+  # hard cap so a single huge page cannot dominate (0 = no cap)
+  max_chars: 0
+
+# ---------------------------------------------------------------
+# Real-crawl pair audit (scripts/clean_crawl.py)
+#   thresholds measured on crawl.db (7,461 pairs):
+#   prose_ratio (cn/en) p05=0.290 p50=0.367 p95=0.569
+#   code_recall         p05=0.625 p50=0.940
+# ---------------------------------------------------------------
+audit:
+  # 只拦"一眼就是坏的"。真实分布：prose_ratio(cn/en) p01=0.057 p50=0.367 p99=1.042
+  prose_ratio_min: 0.10          # 低于此：中文只剩个零头（截断/未译完）
+  prose_ratio_max: 1.50          # 高于此：中文异常膨胀
+  prose_ratio_review_min: 0.25   # 区间外仅标记待查，不删
+  prose_ratio_review_max: 0.75
+  min_cn_cjk_ratio: 0.05         # 中文侧根本不是中文
+  min_identifier_recall: 0.30    # SCP/D-xxxx 编号几乎全丢（≥5 个编号时才算）
+  review_identifier_recall: 0.85
+  min_prose_chars: 120
+  # 分级用，不用于阻断：≥3 类组件差异 → review
+  max_missing_components: 3
+  # 中文侧必然缺失（站点注入的 credit/license 页脚）
+  expected_absent_components: ["component:credit"]
+  # 中文侧必然缺失的 module（SCP-CN 无评分模板）
+  ignore_missing_modules: ["rate", "rating", "stars"]
+  review_missing_modules: ["css", "listpages", "pages"]
+
+# ---------------------------------------------------------------
+# Phase 1 :: splits
+# ---------------------------------------------------------------
+split:
+  train: 0.8
+  val: 0.1
+  test: 0.1
+  # group pages that are variants of each other so they never straddle
+  # two splits. group_key = id with one of these trailing markers removed.
+  variant_markers: ["-D", "-ARC", "-EX", "-J", "-OLD", "-NEW", "-TEST"]
+  # extra safety: identical (source,target) content may live in only one split
+  dedupe_by_content_across_splits: true
+  shuffle: true
+
+# ---------------------------------------------------------------
+# Phase 1 -> 2 :: chat SFT formatting
+# ---------------------------------------------------------------
+format:
+  # The task is framed as a conversion between two *text types* (English SCP
+  # Wikidot source and Chinese SCP Wikidot source), not as "translation": the
+  # model's job is to map one type onto the other while the markup -- tags,
+  # components, parameters, code blocks, link targets -- stays byte-identical.
+  system_prompt: >-
+    你是 SCP 维基的文本类型转换器。英文 SCP Wikidot 文本与中文 SCP Wikidot 文本
+    是同一篇文档的两种类型形式。你的任务是在这两种类型之间转换：Wikidot 标记、
+    组件名、参数名、代码块、链接目标与 URL 一律逐字保持不变，只把正文转换为
+    目标类型的语言。
+  user_template: |-
+    把下面的英文 SCP Wikidot 文本转换为中文 SCP Wikidot 文本：
+
+    {source}
+
+# ---------------------------------------------------------------
+#   data always keeps the untouched raw_source.
+# ---------------------------------------------------------------
+qa:
+  enabled: true
+  output_dir: data/qa
+  structure:
+    prose_ratio_min: 0.25
+    prose_ratio_max: 1.60
+    min_zh_prose_chars: 40
+  semantic:
+    enabled: true
+    qwen_enabled: false        # coverage check is free; Qwen needs a GPU
+    model: Qwen/Qwen2.5-7B-Instruct
+    adapter: null
+    window_chars: 1800
+    max_windows: 24
+    max_pages: 0
+  approve:
+    allow_structure: [pass, review]
+    allow_semantic: [pass, review]
+
+# ---------------------------------------------------------------
+# Phase 7 :: structure-aware chunking for the training dataset
+#   ~2000-8000 tokens per chunk, cut only at heading / section /
+#   paragraph boundaries; EN and ZH chunks stay paired
+# ---------------------------------------------------------------
+chunk:
+  min_tokens: 1200
+  max_tokens: 2400             # 单侧上限；训练上下文 4096，两侧合计须留出 prompt 余量
+  max_total_tokens: 3400       # source+target 合计上限（对应 training.max_seq_length=4096）
+  repeat_section_heading: true
+  repeat_preamble: true
+  preamble_max_chars: 600
+  boundary_search_window: 600
+  split_oversized_paragraphs: true
+  align_sections: auto         # auto | index | proportional
+  min_chunk_chars: 40
+  tokenizer: Qwen/Qwen2.5-7B-Instruct   # 精确 token 计数所需的分词器
+  tokenizer_enabled: true
+
+# ---------------------------------------------------------------
+# Phase 6 :: evaluation
+# ---------------------------------------------------------------
+evaluation:
+  output_dir: outputs/eval
+  batch_size: 8
+  sample_limit: 0        # 0 = all
+  metrics: [bleu, chrf, rouge_l, wikidot, length]
+  # length anomaly band for hypotheses (hyp/ref char ratio)
+  hyp_ref_ratio_min: 0.3
+  hyp_ref_ratio_max: 2.0
+  wikidot:
+    check_balance: true
+    check_includes: true
+    check_modules: true
+    check_html: true
+    check_links: true
+    check_code_blocks: true
+    check_footnotes: true
+    check_tables: true
+    check_unicode_urls: true

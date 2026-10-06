@@ -1,0 +1,46 @@
+[
+  {
+    "label": "16k bs1",
+    "overrides": {
+      "training.max_seq_length": 16384,
+      "training.use_liger_kernel": false,
+      "training.per_device_train_batch_size": 1,
+      "training.gradient_accumulation_steps": 16
+    },
+    "tokens_per_second": 434.9,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 483.6,
+    "steps_done": 4,
+    "per_step": 193.0,
+    "first_step": 36,
+    "train_runtime": 471.3417,
+    "num_tokens": 204998.0,
+    "mean_util": 97.1,
+    "mean_power": 168.1,
+    "peak_vram_gb": 23.56,
+    "log": "/tmp/bench/16k_bs1.log"
+  },
+  {
+    "label": "8k bs1",
+    "overrides": {
+      "training.max_seq_length": 8192,
+      "training.use_liger_kernel": false,
+      "training.per_device_train_batch_size": 1,
+      "training.gradient_accumulation_steps": 16
+    },
+    "tokens_per_second": 1373.8,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 131.9,
+    "steps_done": 4,
+    "per_step": 29.0,
+    "first_step": 36,
+    "train_runtime": 121.3446,
+    "num_tokens": 166698.0,
+    "mean_util": 91.9,
+    "mean_power": 306.9,
+    "peak_vram_gb": 15.67,
+    "log": "/tmp/bench/8k_bs1.log"
+  }
+]

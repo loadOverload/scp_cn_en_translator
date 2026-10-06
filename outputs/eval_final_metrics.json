@@ -1,0 +1,86 @@
+{
+  "base": {
+    "bleu": 42.3641,
+    "chrf": 46.0005,
+    "rouge_l": 71.3273,
+    "wikidot": {
+      "score": 0.8239,
+      "perfect_ratio": 0.0556,
+      "errors_total": 115,
+      "errors_mean": 6.3889,
+      "samples_with_errors": 17,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.922,
+        "param": 0.802,
+        "tag": 0.6798,
+        "url": 0.9246
+      },
+      "top_issues": {
+        "tag_missing": 42,
+        "param_missing": 38,
+        "inline_missing": 18,
+        "url_missing": 9,
+        "inline_unbalanced": 8
+      },
+      "n": 18
+    }
+  },
+  "stage1": {
+    "bleu": 51.5799,
+    "chrf": 56.0931,
+    "rouge_l": 77.2497,
+    "wikidot": {
+      "score": 0.9117,
+      "perfect_ratio": 0.2222,
+      "errors_total": 78,
+      "errors_mean": 4.3333,
+      "samples_with_errors": 14,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.9371,
+        "param": 0.9003,
+        "tag": 0.8497,
+        "url": 0.9495
+      },
+      "top_issues": {
+        "tag_missing": 24,
+        "param_missing": 18,
+        "inline_missing": 17,
+        "inline_unbalanced": 11,
+        "url_missing": 8
+      },
+      "n": 18
+    }
+  },
+  "stage3": {
+    "bleu": 51.9328,
+    "chrf": 58.8964,
+    "rouge_l": 80.0731,
+    "wikidot": {
+      "score": 0.9547,
+      "perfect_ratio": 0.0556,
+      "errors_total": 43,
+      "errors_mean": 2.3889,
+      "samples_with_errors": 17,
+      "per_check": {
+        "code": 1.0,
+        "heading": 1.0,
+        "inline": 0.9796,
+        "param": 0.9665,
+        "tag": 0.8812,
+        "url": 0.9907
+      },
+      "top_issues": {
+        "tag_missing": 19,
+        "inline_unbalanced": 11,
+        "inline_missing": 9,
+        "param_missing": 3,
+        "url_missing": 1
+      },
+      "n": 18
+    }
+  }
+}

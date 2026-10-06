@@ -1,0 +1,64 @@
+[
+  {
+    "label": "16k bs1",
+    "overrides": {
+      "training.max_seq_length": 16384,
+      "training.use_liger_kernel": false
+    },
+    "tokens_per_second": 858.4,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 248.9,
+    "steps_done": 4,
+    "per_step": 80.5,
+    "first_step": 28,
+    "train_runtime": 238.8146,
+    "num_tokens": 204998.0,
+    "mean_util": 95.5,
+    "mean_power": 240.1,
+    "peak_vram_gb": 23.54,
+    "log": "/tmp/bench/16k_bs1.log"
+  },
+  {
+    "label": "8k bs1",
+    "overrides": {
+      "training.max_seq_length": 8192,
+      "training.use_liger_kernel": false
+    },
+    "tokens_per_second": 1458.9,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 124.0,
+    "steps_done": 4,
+    "per_step": 26.0,
+    "first_step": 35,
+    "train_runtime": 114.2663,
+    "num_tokens": 166698.0,
+    "mean_util": 91.3,
+    "mean_power": 313.0,
+    "peak_vram_gb": 15.53,
+    "log": "/tmp/bench/8k_bs1.log"
+  },
+  {
+    "label": "8k bs2",
+    "overrides": {
+      "training.max_seq_length": 8192,
+      "training.per_device_train_batch_size": 2,
+      "training.gradient_accumulation_steps": 8,
+      "training.use_liger_kernel": false
+    },
+    "tokens_per_second": 759.0,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 233.1,
+    "steps_done": 4,
+    "per_step": 69.5,
+    "first_step": 45,
+    "train_runtime": 219.6185,
+    "num_tokens": 166698.0,
+    "mean_util": 93.6,
+    "mean_power": 242.5,
+    "peak_vram_gb": 23.5,
+    "log": "/tmp/bench/8k_bs2.log"
+  }
+]

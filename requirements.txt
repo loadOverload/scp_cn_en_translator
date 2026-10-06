@@ -1,0 +1,46 @@
+# scp-translator requirements
+#
+# IMPORTANT: on this machine torch is NOT installed here.
+# The working CUDA torch (2.5.1+cu121) already exists in the conda env
+# `~/miniconda3/envs/microbiome`, so the project uses a venv that *inherits*
+# that environment's packages and only adds the missing ones:
+#
+#   ~/miniconda3/envs/microbiome/bin/python -m venv --system-site-packages .venv-gpu
+#   .venv-gpu/bin/pip install -r requirements.txt \
+#       -i https://pypi.tuna.tsinghua.edu.cn/simple
+#
+# Use `.venv-gpu/bin/python` for everything (it sees the conda env's torch).
+# Always install with the tuna mirror: huggingface.co is unreachable here, and
+# download.pytorch.org stalls on large wheels.
+
+# --- inherited from ~/miniconda3/envs/microbiome (do NOT reinstall) ---
+# torch==2.5.1+cu121     (CUDA verified working on the RTX 4090)
+# numpy, pyyaml, tqdm
+
+# --- training stack (Phase 2) ---
+transformers>=4.46
+datasets>=3.0
+accelerate>=1.0
+peft>=0.13
+trl>=0.12
+bitsandbytes>=0.44
+
+# --- data / io (Phase 1, 4) ---
+pandas>=2.0
+safetensors>=0.4
+sentencepiece>=0.2
+protobuf>=4.0
+
+# --- evaluation (Phase 6) ---
+sacrebleu>=2.4
+rouge-score>=0.1.2
+
+# Version notes from the verified install:
+#   transformers 5.18.0, peft 0.21.2, trl 1.14.1, bitsandbytes 0.50.2,
+#   datasets 5.0.1, accelerate 1.15.0, sacrebleu 2.6.0
+# The trainer probes library APIs at runtime and falls back cleanly
+# (e.g. TRL >= 1.x needs a datasets.Dataset -- handled in build_trl_trainer).
+#
+# If pip ever hangs on "Attempting uninstall: typing-extensions", it is trying
+# to remove the package inherited from the conda env. Install the remaining
+# packages with --no-deps instead.

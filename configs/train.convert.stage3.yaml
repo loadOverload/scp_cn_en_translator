@@ -1,0 +1,57 @@
+# =============================================================
+# 阶段 3：从 stage2 的 checkpoint-100 继续，改用完整覆盖的 8k 长训练集
+#
+#   为什么有这个阶段：
+#     原 stage2 用的是按 16,384 预算造的长集（8,184 条）。训练时设
+#     max_seq_length: 8192，于是 1,984 条（24.2%）超过 8192 的窗口被直接
+#     丢弃，实际只训了 6,200 条 —— 丢掉的正是不满长文档的多段落窗口，
+#     而长文档恰恰是长集存在的意义。
+#
+#     data/conversion_8k/ 是同一批内容按 8,185 预算重新打包的结果：
+#       9,977 train / 187 val，实测丢弃 0 条，47.9M token，文档覆盖 99.4%
+#     （构建时用 8,185 而非 8,192，是因为训练走 apply_chat_template 比构建
+#      脚本的计数恒定多 7 个 token 的 ChatML 控制符）
+#
+#   起点：stage2 的 checkpoint-100（已跑 100/388 步，eval_loss 0.869 → 0.859）
+#         用 init_adapter 而不是 resume_from_checkpoint：后者会连优化器状态
+#         和步数一起恢复，换了数据集是错的。
+#
+#   运行： ./py scripts/train.py --config configs/train.convert.stage3.yaml
+# =============================================================
+
+defaults: train.yaml
+
+model:
+  name_or_path: Qwen/Qwen2.5-7B-Instruct
+  attn_implementation: sdpa
+
+training:
+  optim: adamw_torch
+  output_dir: outputs/qwen2.5-7b-scp-convert-stage3-8k
+  # 8k 上下文下 bs1 是实测最优：benchmark 显示 bs1 比 bs2 快 39%，
+  # 因为动态 padding 会把 bs2 的批内最长样本拉高实际计算的 token 量，
+  # bs1 是零 padding。有效 batch 仍为 16。
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  num_train_epochs: 1                       # 9,977 条，一轮 624 步
+  learning_rate: 1.0e-4
+  max_seq_length: 8192                      # 数据按 8,185 预算造的，留了 7 token 余量
+  use_liger_kernel: true
+  overlong_policy: drop
+  train_on_assistant_only: True
+  tokenize_workers: 16                      # 实测甜点（32 线程反而只有 7.39×）
+  tokenized_cache_dir: data/tokenized_cache
+  logging_steps: 5
+  save_steps: 50
+  save_total_limit: 3
+  eval_steps: 50
+  eval_strategy: steps
+  dataloader_num_workers: 4
+  seed: 42
+
+  init_adapter: outputs/qwen2.5-7b-scp-convert-stage2/checkpoint-100
+
+data_files:
+  chat_train: data/conversion_8k/long.train.chat.jsonl
+  chat_val: data/conversion_8k/long.val.chat.jsonl

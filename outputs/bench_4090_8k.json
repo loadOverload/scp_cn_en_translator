@@ -1,0 +1,22 @@
+[
+  {
+    "label": "8k bs1",
+    "overrides": {
+      "training.max_seq_length": 8192,
+      "training.use_liger_kernel": false
+    },
+    "tokens_per_second": 1320.0,
+    "ok": true,
+    "error": "",
+    "wall_seconds": 148.9,
+    "steps_done": 4,
+    "per_step": 30.0,
+    "first_step": 37,
+    "train_runtime": 126.2889,
+    "num_tokens": 166698.0,
+    "mean_util": 84.0,
+    "mean_power": 273.4,
+    "peak_vram_gb": 16.53,
+    "log": "/tmp/bench/8k_bs1.log"
+  }
+]

@@ -1,0 +1,108 @@
+# =============================================================
+# SCP-translator :: Phase 2 QLoRA training configuration
+# Model: Qwen 7B class  |  Method: 4-bit QLoRA
+# =============================================================
+
+# base config merged on top of configs/default.yaml
+defaults: default.yaml
+
+model:
+  name_or_path: Qwen/Qwen2.5-7B-Instruct
+  # revision: main
+  trust_remote_code: false
+  # "auto" -> bf16 when the GPU supports it, else fp16
+  dtype: auto
+  attn_implementation: sdpa      # sdpa | flash_attention_2 | eager
+  use_cache: false               # must be False with gradient checkpointing
+
+quantization:
+  enabled: true                  # QLoRA = 4-bit base weights
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  # auto -> bf16 if supported else fp16
+  bnb_4bit_compute_dtype: auto
+
+lora:
+  enabled: true
+  # "auto"        -> intersect the canonical Qwen attention+MLP list with the
+  #                  module names that ACTUALLY exist in the loaded model
+  # "all-linear"  -> PEFT expands to every linear layer
+  # explicit list -> e.g. [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  target_modules: auto
+  # canonical candidates probed by the autodetector, in priority order
+  target_module_candidates:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    # MoE / alternative Qwen blocks (harmless if absent)
+    - qkv_proj
+    - gate_up_proj
+    - W_pack
+    - c_attn
+    - c_proj
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+  use_rslora: false
+  modules_to_save: null
+
+training:
+  output_dir: outputs/qwen2.5-7b-scp-qlora
+  trainer: auto                  # auto | trl | native
+  num_train_epochs: 3
+  max_steps: -1                  # >0 overrides epochs (useful for smoke tests)
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  learning_rate: 1.0e-4
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  # see configs/train.convert.stage2.yaml: paged optimizers trigger
+  # torch.compile through bitsandbytes and are pointless for a LoRA adapter
+  optim: adamw_torch        # falls back to adamw_torch[_8bit] if unavailable
+  max_seq_length: 4096
+  # drop | truncate  (drop = discard samples longer than max_seq_length)
+  overlong_policy: drop
+  # train the loss on assistant tokens only (recommended for translation)
+  train_on_assistant_only: true
+  gradient_checkpointing: true
+  gradient_checkpointing_kwargs:
+    use_reentrant: false
+  bf16: auto                     # auto | true | false
+  fp16: false
+  tf32: true
+  logging_steps: 5
+  save_strategy: steps
+  save_steps: 200
+  save_total_limit: 3
+  eval_strategy: steps
+  eval_steps: 200
+  report_to: [tensorboard]
+  dataloader_num_workers: 2
+  dataloader_pin_memory: true
+  # group_by_length (HF) gave +15%; a globally bucketed batch sampler I wrote
+  # gave -17%, but its plumbing was suspect (a batch sampler returned where the
+  # Trainer expects an index sampler, so DataLoader wrapped it twice). Neither
+  # result is trustworthy, so this stays at the framework default.
+  train_sampling_strategy: random
+  seed: 42
+  resume_from_checkpoint: null   # null | "auto" | path/to/checkpoint-XXX
+  packing: false                 # keep off: one page per sample
+
+# data files consumed by training (produced by Phase 1)
+data_files:
+  train: data/splits/train.jsonl
+  val: data/splits/val.jsonl
+  test: data/splits/test.jsonl
+  # where Phase 1 writes the chat-format SFT files
+  chat_train: data/splits/train.chat.jsonl
+  chat_val: data/splits/val.chat.jsonl

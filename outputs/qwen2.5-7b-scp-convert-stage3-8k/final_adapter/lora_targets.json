@@ -1,0 +1,52 @@
+{
+  "requested": "auto",
+  "n_linear_layers": 197,
+  "leaf_histogram": {
+    "q_proj": 28,
+    "k_proj": 28,
+    "v_proj": 28,
+    "o_proj": 28,
+    "gate_proj": 28,
+    "up_proj": 28,
+    "down_proj": 28,
+    "lm_head": 1
+  },
+  "example_names": {
+    "q_proj": "model.layers.0.self_attn.q_proj",
+    "k_proj": "model.layers.0.self_attn.k_proj",
+    "v_proj": "model.layers.0.self_attn.v_proj",
+    "o_proj": "model.layers.0.self_attn.o_proj",
+    "gate_proj": "model.layers.0.mlp.gate_proj",
+    "up_proj": "model.layers.0.mlp.up_proj",
+    "down_proj": "model.layers.0.mlp.down_proj",
+    "lm_head": "lm_head"
+  },
+  "resolved": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "matched": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "missing": [
+    "qkv_proj",
+    "gate_up_proj",
+    "W_pack",
+    "c_attn",
+    "c_proj"
+  ],
+  "total_params": 4393342464,
+  "trainable_params": 40370176,
+  "trainable_pct": 0.9189
+}

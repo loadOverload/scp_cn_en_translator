@@ -21,7 +21,9 @@ tags:
 
 把英文 SCP Wikidot 源码转换为中文 SCP Wikidot 源码的 QLoRA 适配器。
 
-**基座**：[Qwen/Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) · **权重**：LoRA r=16，77 MiB
+**基座**：[Qwen/Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) · **权重**：LoRA r=16，77 MB
+
+> **权重文件从 [v1.0 Release](https://github.com/loadOverload/scp_cn_en_translator/releases/tag/v1.0) 下载**（`scp-convert-7b-lora-v1.0.zip`）。本仓库只保留模型卡，二进制不进 git 历史。
 
 > **它改进的是格式遵从，不是翻译质量。** 作为译者初稿工具使用，不要直接发布未经人工校对的产出。详见下方[已知问题](#已知问题)。
 

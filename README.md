@@ -6,19 +6,25 @@
 
 ## 发布物
 
-**模型权重就在本仓库里**（77 MiB）：
+**模型权重从 Release 下载**（77 MB，不进 git）：
+
+> **[⬇ v1.0 Release](https://github.com/loadOverload/scp_cn_en_translator/releases/tag/v1.0)**
+> 附件 `scp-convert-7b-lora-v1.0.zip`（60.67 MiB）解压后：
 
 ```
-outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter/
+scp-convert-7b-lora/
   adapter_model.safetensors   LoRA r=16 权重
   adapter_config.json         架构声明
-  README.md                   模型卡（含加载代码与已知问题）
   chat_template.jinja         训练时的 chat 模板
+  MODEL_CARD.md               模型卡：加载代码、提示词格式、完整已知问题
+  LICENSE / LICENSE-NOTICE    许可
 ```
 
-基座模型需要另外下载：`Qwen/Qwen2.5-7B-Instruct`。本目录不含 `tokenizer.json`，tokenizer 从基座加载。
+仓库里保留了模型卡，方便直接阅读：
 
-**加载方式与提示词格式见模型卡** → [`final_adapter/README.md`](outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter/README.md)
+**[`final_adapter/README.md`](outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter/README.md)** —— 加载代码、提示词格式、预算切分、完整已知问题
+
+基座模型需要另外下载：`Qwen/Qwen2.5-7B-Instruct`。适配器不含 `tokenizer.json`，tokenizer 从基座加载。
 
 **文档：**
 

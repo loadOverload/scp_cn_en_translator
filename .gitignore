@@ -41,6 +41,11 @@ outputs/*.log
 outputs/qwen2.5-7b-scp-convert-stage3-8k/*
 !outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter/
 
+# 权重只在 GitHub Release 提供，不进 git。
+# 77 MiB 的二进制留在历史里会让每次 clone 都多下 77 MiB，
+# 而且以后每更新一版权重就再叠一份。
+outputs/qwen2.5-7b-scp-convert-stage3-8k/final_adapter/adapter_model.safetensors
+
 # =============================================================================
 # 日志
 # =============================================================================

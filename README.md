@@ -109,7 +109,7 @@ docs/              模型说明文档
 本作品采用 **Creative Commons Attribution-ShareAlike 3.0 Unported**（CC BY-SA 3.0）许可协议。
 
 - 完整法律文本：[`LICENSE`](LICENSE)
-- 中文说明与语料来源：[`LICENSE-NOTICE.md`](LICENSE-NOTICE.md)
+- 中文说明与语料来源：[`NOTICE.md`](NOTICE.md)
 
 语料版权归 SCP 基金会及 SCP 中文分部各原作者所有，遵循 CC BY-SA 3.0。本项目的模型权重为在既有译文上训练的衍生作品，因此沿用同一许可协议。
 
